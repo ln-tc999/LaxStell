@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="frontend/public/favicon.svg" alt="Lax-Stell" width="120" />
+  <img src="frontend/src/assets/logo-dark.png" alt="Lax-Stell" width="120" />
 </p>
 
 <h1 align="center">Lax-Stell</h1>
@@ -20,9 +20,9 @@
   <a href="#overview">Overview</a> ·
   <a href="#why-lax-stell">Why Lax-Stell</a> ·
   <a href="#the-system-flows">System Flows</a> ·
+  <a href="#smart-contracts">Contracts</a> ·
   <a href="#how-it-works">How It Works</a> ·
   <a href="#architecture">Architecture</a> ·
-  <a href="#smart-contracts">Contracts</a> ·
   <a href="#cross-chain-bridge">Cross-Chain Bridge</a> ·
   <a href="#quick-start">Quick Start</a>
 </p>
@@ -51,11 +51,11 @@ Every state transition out of the shielded layer is gated by a **zero-knowledge 
 - [Overview](#overview)
 - [Why Lax-Stell](#why-lax-stell)
 - [The System Flows](#the-system-flows)
+- [Smart Contracts](#smart-contracts)
 - [How It Works](#how-it-works)
 - [Architecture](#architecture)
 - [Tech Stack](#tech-stack)
 - [Key Files](#key-files)
-- [Smart Contracts](#smart-contracts)
 - [Cross-Chain Bridge](#cross-chain-bridge)
 - [Quick Start](#quick-start)
 - [Hackathon](#hackathon)
