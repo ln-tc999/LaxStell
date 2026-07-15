@@ -7,7 +7,7 @@
  * networks / private deployments.
  *
  * deployments.json (testnet):
- *   pool        CD7EF4GG32IPVS2PGD2LMXEO3TPEWBZRUCBBSPXQ236CD6TMF5S4UUZR
+ *   pool        CBZNNVUKTG6YSVT3NGV7MDVL5ZQO5D4KLLIRFAGBCORPH7Q62ZHS5RP3
  *   native SAC  CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC
  *   passphrase  "Test SDF Network ; September 2015"
  */
@@ -31,15 +31,17 @@ function flag(key: string): boolean {
 /**
  * LaxStellPool contract id on the configured network.
  *
- * Points at the match-memo pool (redeployed 2026-07-02): `transfer` AND `match_orders` carry
- * encrypted note payloads (+ full leaf set/indices) in their events, which the recipient's
- * indexer scans to auto-discover incoming notes and settlement fills. Fresh tree; reuses the
- * existing verifier contracts. Prior pools: memo pool CBVM7B622FSW47FDNUVU7GEU7TNRVRWEVOTNAUWVUOHFMIPSTDL2YVNG,
+ * Points at the Lax-Stell rebranded redeploy (2026-07-15): the pool + all 5 verifiers were rebuilt
+ * from the lax-stell source (LaxStellPool/LaxStellError symbols) on a fresh tree, reusing the
+ * existing faucet SACs. `transfer` AND `match_orders` carry encrypted note payloads (+ full leaf
+ * set/indices) in their events, which the recipient's indexer scans to auto-discover incoming
+ * notes and settlement fills. Prior pools: match-memo (Wraith build) CA2CI7VKG27V3FIXD3OYXFYTN33DMI5QR4WFBX3N5SRC6JWEO3AWDILD,
+ * memo pool CBVM7B622FSW47FDNUVU7GEU7TNRVRWEVOTNAUWVUOHFMIPSTDL2YVNG,
  * pre-memo pool CD7EF4GG32IPVS2PGD2LMXEO3TPEWBZRUCBBSPXQ236CD6TMF5S4UUZR.
  */
 export const POOL_CONTRACT_ID = env(
   'VITE_LAX_STELL_POOL',
-  'CA2CI7VKG27V3FIXD3OYXFYTN33DMI5QR4WFBX3N5SRC6JWEO3AWDILD',
+  'CBZNNVUKTG6YSVT3NGV7MDVL5ZQO5D4KLLIRFAGBCORPH7Q62ZHS5RP3',
 )
 
 /** Native (XLM) Stellar Asset Contract address. */
@@ -57,7 +59,7 @@ export const MATCHER_URL = env('VITE_MATCHER_URL', '')
 
 /** Ledger the pool was deployed at — the client indexer's cold-start floor (clamped to the
  *  RPC's event-retention window, so older history is unavailable). */
-export const POOL_DEPLOY_LEDGER = Number(env('VITE_POOL_DEPLOY_LEDGER', '3402675'))
+export const POOL_DEPLOY_LEDGER = Number(env('VITE_POOL_DEPLOY_LEDGER', '3617285'))
 
 /** Stellar network passphrase. */
 export const NETWORK_PASSPHRASE = env('VITE_NETWORK_PASSPHRASE', 'Test SDF Network ; September 2015')

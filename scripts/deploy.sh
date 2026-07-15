@@ -16,13 +16,17 @@ echo "==> Building wasms (stellar build needs rust 1.92.0)"
 ( cd vendor/rs-soroban-ultrahonk && RUSTUP_TOOLCHAIN=1.92.0 stellar contract build )
 ( cd contracts && RUSTUP_TOOLCHAIN=1.92.0 stellar contract build )
 
-declare -A VF
-for c in withdraw transfer place_order match_orders cancel_order; do
-  echo "==> Deploying verifier: $c"
-  VF[$c]=$(stellar contract deploy --wasm "$VERIFIER_WASM" --source "$IDENT" --network "$NET" \
-            -- --vk_bytes-file-path "circuits/artifacts/$c/vk" | tail -1)
-  echo "    ${VF[$c]}"
-done
+# One verifier per circuit VK. Plain vars (no `declare -A`) so this runs on the
+# macOS system bash 3.2 as well as bash 4+.
+deploy_vf() {
+  stellar contract deploy --wasm "$VERIFIER_WASM" --source "$IDENT" --network "$NET" \
+    -- --vk_bytes-file-path "circuits/artifacts/$1/vk" | tail -1
+}
+echo "==> Deploying verifier: withdraw";     VF_WITHDRAW=$(deploy_vf withdraw);     echo "    $VF_WITHDRAW"
+echo "==> Deploying verifier: transfer";     VF_TRANSFER=$(deploy_vf transfer);     echo "    $VF_TRANSFER"
+echo "==> Deploying verifier: place_order";  VF_PLACE=$(deploy_vf place_order);     echo "    $VF_PLACE"
+echo "==> Deploying verifier: match_orders"; VF_MATCH=$(deploy_vf match_orders);    echo "    $VF_MATCH"
+echo "==> Deploying verifier: cancel_order"; VF_CANCEL=$(deploy_vf cancel_order);   echo "    $VF_CANCEL"
 
 # Native-XLM SAC address — the pool maps it to the canonical native asset_id 0
 # (SHARED §4) when binding `withdraw`'s `asset` arg to the proof's public `asset_id`.
@@ -30,27 +34,44 @@ NATIVE=$(stellar contract id asset --asset native --network "$NET")
 
 echo "==> Deploying lax-stell-pool"
 POOL=$(stellar contract deploy --wasm "$POOL_WASM" --source "$IDENT" --network "$NET" -- \
-  --transfer_vf  "${VF[transfer]}" \
-  --order_vf     "${VF[place_order]}" \
-  --match_vf     "${VF[match_orders]}" \
-  --withdraw_vf  "${VF[withdraw]}" \
-  --cancel_vf    "${VF[cancel_order]}" \
+  --transfer_vf  "$VF_TRANSFER" \
+  --order_vf     "$VF_PLACE" \
+  --match_vf     "$VF_MATCH" \
+  --withdraw_vf  "$VF_WITHDRAW" \
+  --cancel_vf    "$VF_CANCEL" \
   --native_asset "$NATIVE" | tail -1)
 echo "    POOL=$POOL"
 
-cat > deployments.json <<JSON
-{
-  "network": "$NET",
-  "deployer": "$(stellar keys address "$IDENT")",
-  "contracts": {
-    "laxStellPool": "$POOL",
-    "verifiers": {
-      "withdraw": "${VF[withdraw]}", "transfer": "${VF[transfer]}",
-      "place_order": "${VF[place_order]}", "match_orders": "${VF[match_orders]}",
-      "cancel_order": "${VF[cancel_order]}"
-    },
-    "assets": { "native": "$NATIVE" }
-  }
+# Merge the fresh Lax-Stell contract ids into the existing deployments.json
+# (preserving bridge / faucet / e2e / history) rather than clobbering it.
+DEPLOYER_ADDR="$(stellar keys address "$IDENT")"
+DEPLOY_DATE="$(date +%Y-%m-%d)"
+
+POOL="$POOL" NATIVE="$NATIVE" DEPLOYER_ADDR="$DEPLOYER_ADDR" DEPLOY_DATE="$DEPLOY_DATE" \
+VF_WITHDRAW="$VF_WITHDRAW" VF_TRANSFER="$VF_TRANSFER" VF_PLACE="$VF_PLACE" \
+VF_MATCH="$VF_MATCH" VF_CANCEL="$VF_CANCEL" \
+python3 - "$@" <<'PY'
+import json, os, pathlib
+p = pathlib.Path("deployments.json")
+d = json.loads(p.read_text()) if p.exists() else {}
+env = os.environ
+d["network"] = env.get("NET", d.get("network", "testnet"))
+d["deployer"] = env["DEPLOYER_ADDR"]
+d["deployedAt"] = env["DEPLOY_DATE"]
+c = d.setdefault("contracts", {})
+# Fresh Lax-Stell pool (rebranded redeploy) — this is what the frontend targets.
+c["laxStellPoolMatchMemo"] = {
+    "note": f"Lax-Stell rebranded redeploy ({env['DEPLOY_DATE']}): pool + 5 verifiers rebuilt "
+            "from lax-stell source (LaxStellPool/LaxStellError symbols). Reuses existing faucet SACs.",
+    "contract": env["POOL"],
+    "deployer": env["DEPLOYER_ADDR"],
 }
-JSON
-echo "==> Wrote deployments.json"
+c["verifiers"] = {
+    "withdraw": env["VF_WITHDRAW"], "transfer": env["VF_TRANSFER"],
+    "place_order": env["VF_PLACE"], "match_orders": env["VF_MATCH"],
+    "cancel_order": env["VF_CANCEL"],
+}
+c.setdefault("assets", {})["native"] = env["NATIVE"]
+p.write_text(json.dumps(d, indent=2) + "\n")
+print(f"==> Merged fresh ids into deployments.json (pool={env['POOL']})")
+PY
