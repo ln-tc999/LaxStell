@@ -1,0 +1,7 @@
+[package]
+name = "transfer"
+type = "bin"
+authors = ["LaxStell"]
+
+[dependencies]
+lax_stell_lib = { path = "../lax_stell_lib" }

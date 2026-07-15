@@ -1,0 +1,241 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------------------------------------------------------------------------
+ * Theme tokens — every Mist/Halo/Patina/warm-zinc shade as an `R G B` triplet.
+ * :root is the LIGHT theme (a bright sepia fog); `.dark` reflects the ramp back
+ * to the original dark "Mist" world. The whole app reads these through Tailwind
+ * (bg-ink-*, text-zinc-*, text-spectral, patina-*, …), so it flips with the class.
+ * ------------------------------------------------------------------------- */
+:root {
+  /* LIGHT = "broken white": a neutral off-white ground (only the faintest warm
+     tint), near-black neutral text, and the same gold accent kept for contrast.
+     Backgrounds are the high mist/zinc shades; text is the low shades. */
+  --mist-50: 26 25 23;
+  --mist-100: 33 32 30;
+  --mist-200: 45 44 41;
+  --mist-300: 62 61 57;
+  --mist-400: 92 90 85;
+  --mist-500: 120 118 112;
+  --mist-600: 150 148 142;
+  --mist-700: 184 182 175;
+  --mist-750: 205 203 197;
+  --mist-800: 220 218 212;
+  --mist-850: 231 229 224;
+  --mist-900: 240 239 235;
+  --mist-950: 246 245 242;
+
+  --halo: 34 33 31;
+  --halo-soft: 24 23 21;
+  --halo-dim: 108 106 102;
+  --halo-glow: 40 39 36;
+  --halo-deep: 150 148 143;
+
+  --patina-300: 176 138 46;
+  --patina-400: 158 128 46;
+  --patina-500: 124 99 34;
+
+  --zinc-50: 26 25 23;
+  --zinc-100: 33 32 30;
+  --zinc-200: 45 44 41;
+  --zinc-300: 62 61 57;
+  --zinc-400: 92 90 85;
+  --zinc-500: 120 118 112;
+  --zinc-600: 150 148 142;
+  --zinc-700: 184 182 175;
+  --zinc-800: 220 218 212;
+  --zinc-900: 236 235 231;
+  --zinc-950: 246 245 242;
+}
+
+.dark {
+  --mist-50: 243 240 231;
+  --mist-100: 233 228 213;
+  --mist-200: 214 208 188;
+  --mist-300: 187 180 158;
+  --mist-400: 154 149 131;
+  --mist-500: 120 115 95;
+  --mist-600: 86 82 67;
+  --mist-700: 59 56 45;
+  --mist-750: 48 46 36;
+  --mist-800: 36 34 27;
+  --mist-850: 28 26 20;
+  --mist-900: 22 21 15;
+  --mist-950: 15 14 9;
+
+  --halo: 237 235 230;
+  --halo-soft: 247 246 242;
+  --halo-dim: 182 179 172;
+  --halo-glow: 242 240 235;
+  --halo-deep: 110 107 100;
+
+  --patina-300: 214 197 124;
+  --patina-400: 191 162 76;
+  --patina-500: 156 127 48;
+
+  --zinc-50: 246 243 234;
+  --zinc-100: 236 231 217;
+  --zinc-200: 216 210 191;
+  --zinc-300: 187 180 158;
+  --zinc-400: 148 143 125;
+  --zinc-500: 114 110 92;
+  --zinc-600: 82 78 65;
+  --zinc-700: 59 56 45;
+  --zinc-800: 36 34 27;
+  --zinc-900: 22 21 15;
+  --zinc-950: 15 14 9;
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  :root {
+    color-scheme: light;
+  }
+  .dark {
+    color-scheme: dark;
+  }
+
+  /* Act-nav jump links glide; honour reduced-motion. */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  body {
+    @apply min-h-screen bg-ink-950 font-sans text-zinc-300;
+    /* Warm gold haze (the sun through fog) + a fine fractal-noise grain in the
+       negative space. Cards sit cleanly on top of the texture. */
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E"),
+      radial-gradient(60rem 40rem at 50% -14rem, rgba(232, 230, 224, 0.07), transparent 60%),
+      radial-gradient(42rem 32rem at 86% 2rem, rgba(232, 230, 224, 0.04), transparent 58%);
+    background-repeat: repeat, no-repeat, no-repeat;
+    background-size: 140px 140px, auto, auto;
+    background-blend-mode: overlay, normal, normal;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: 'Montserrat', ui-sans-serif, system-ui, sans-serif;
+    @apply tracking-tight text-zinc-100;
+  }
+
+  ::selection {
+    @apply bg-spectral/30 text-mist-950;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(var(--mist-700)) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  *::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-ink-600;
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border border-ink-700 bg-ink-850/80 shadow-panel;
+  }
+
+  .panel-title {
+    @apply text-sm font-semibold tracking-tight text-zinc-100;
+  }
+
+  .label {
+    @apply mb-1.5 block text-xs font-medium text-zinc-400;
+  }
+
+  .input {
+    @apply w-full rounded-xl border border-ink-700 bg-ink-900/70 px-3.5 py-2.5 text-sm text-zinc-100
+           outline-none transition placeholder:text-zinc-600
+           focus:border-spectral/60 focus:ring-2 focus:ring-spectral/20;
+  }
+  .input-mono {
+    @apply font-mono tracking-tight;
+  }
+
+  .btn {
+    @apply inline-flex cursor-pointer select-none items-center justify-center gap-2 rounded-xl px-4 py-2.5
+           text-sm font-semibold transition active:scale-[0.99]
+           disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100;
+  }
+  .btn-sm {
+    @apply rounded-lg px-3 py-1.5 text-xs;
+  }
+  .btn-primary {
+    @apply bg-spectral text-mist-950 hover:bg-spectral-soft;
+  }
+  .btn-outline {
+    @apply border border-ink-600 bg-ink-800/50 text-zinc-200 hover:border-spectral/50 hover:text-zinc-100;
+  }
+  .btn-ghost {
+    @apply text-zinc-400 hover:bg-ink-800 hover:text-zinc-100;
+  }
+  .btn-danger {
+    @apply border border-red-500/30 bg-red-500/10 text-red-300 hover:bg-red-500/20;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium;
+  }
+
+  /* --- Continuum shell (monopo-continuous /app) ------------------------------ */
+
+  /* The coordinate-label vernacular carried over from the landing hero. */
+  .coord-label {
+    @apply font-mono text-[10px] uppercase tracking-[0.16em] text-spectral/55;
+  }
+
+  /* Uppercase grotesque display type — the masthead + act titles. Uses the
+     themed `spectral-soft` (near-white in dark, near-black in light) so app-shell
+     titles stay legible in both themes. Only used on app surfaces, never the
+     always-dark landing. */
+  .display-hd {
+    @apply font-display font-semibold uppercase tracking-[-0.03em] text-spectral-soft;
+    line-height: 0.98;
+  }
+
+  /* The cream spread that closes the film — same world as the landing footer. */
+  .cream-panel {
+    @apply relative overflow-hidden text-[#1b1610];
+    background: #f4efe4;
+  }
+}
+
+/* Film grain, shared by the brand canvas and the cream footer. */
+.wr-grain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.45 0.45 0.45 0 -0.4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-size: 90px 90px;
+}
+
+/* ScrambleText — encrypted glyphs decoding into letters (monopo-style intro). */
+.wr-scramble-glyph {
+  display: inline-block;
+  font-variant-ligatures: none;
+}
+/* Scrambling glyphs are filled with fine film grain (not a glitch) — a grainy
+   dissolve that resolves to solid type once the letter settles. */
+.wr-scramble-char {
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  background-color: rgb(var(--halo-soft));
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.45 0.45 0.45 0 -0.4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-size: 90px 90px;
+  -webkit-background-clip: text;
+  background-clip: text;
+}
