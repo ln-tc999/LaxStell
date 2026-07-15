@@ -109,6 +109,29 @@ Lax-Stell coordinates multiple flows against the shielded pool, changing only th
 
 ---
 
+## Smart Contracts
+
+### Addresses (Stellar Testnet)
+
+The full system is live and verified on Stellar Testnet.
+
+| Contract | Address | Description |
+|---|---|---|
+| **Lax-Stell Pool** | [`CBZNNVUKTG6YSVT3NGV7MDVL5ZQO5D4KLLIRFAGBCORPH7Q62ZHS5RP3`](https://stellar.expert/explorer/testnet/contract/CBZNNVUKTG6YSVT3NGV7MDVL5ZQO5D4KLLIRFAGBCORPH7Q62ZHS5RP3) | Core pool handling deposits, transfers, swaps, and withdrawals. |
+| **Verifier · withdraw** | [`CDS245ZQLXFIYD2TPSJWZLAO6TOZOGRF6FQWAJ35J5SG6A7WNMHUMD5B`](https://stellar.expert/explorer/testnet/contract/CDS245ZQLXFIYD2TPSJWZLAO6TOZOGRF6FQWAJ35J5SG6A7WNMHUMD5B) | On-chain UltraHonk verifier checking withdraw proofs. |
+| **Verifier · transfer** | [`CCTHUAA3I4R2BRUQEFREHQ3AWVLTCZECAZ7JRG5S23FM44LP27RY5NZB`](https://stellar.expert/explorer/testnet/contract/CCTHUAA3I4R2BRUQEFREHQ3AWVLTCZECAZ7JRG5S23FM44LP27RY5NZB) | On-chain UltraHonk verifier checking transfer proofs. |
+| **Verifier · place_order** | [`CABWY7YM7C4FCJBGQ7KG47N6NKZOBHWGMHAEYDTOGE6LDPOLZNGR2BF6`](https://stellar.expert/explorer/testnet/contract/CABWY7YM7C4FCJBGQ7KG47N6NKZOBHWGMHAEYDTOGE6LDPOLZNGR2BF6) | On-chain UltraHonk verifier checking order placement. |
+| **Verifier · match_orders** | [`CCKOCCPIYRRSCFNGDW3BDOGW4R2V7XY6KYHZVJDFB5KTKR5U3LPMAB5T`](https://stellar.expert/explorer/testnet/contract/CCKOCCPIYRRSCFNGDW3BDOGW4R2V7XY6KYHZVJDFB5KTKR5U3LPMAB5T) | On-chain UltraHonk verifier checking midpoint matches. |
+| **Verifier · cancel_order** | [`CCU4JPTB4KRSG2N6YOTPT7SDXMYIC7RJOMEHUCR44FADEBRBWXQTTB2M`](https://stellar.expert/explorer/testnet/contract/CCU4JPTB4KRSG2N6YOTPT7SDXMYIC7RJOMEHUCR44FADEBRBWXQTTB2M) | On-chain UltraHonk verifier checking order cancellations. |
+
+### Live ZK Proof Verification (E2E)
+
+Verified end-to-end on the current pool with a **real Noir/UltraHonk proof** (14,592-byte proof / 1,760-byte VK, keccak transcript) checked inside the Soroban contract:
+- **Deposit** 1 XLM → shielded note at leaf 0, commitment `0f090472…78e2…f92d0a` ([tx `cdaa631c…`](https://stellar.expert/explorer/testnet/tx/cdaa631c68bedd73a7cf469285e21c4d8ece913100baf9ae6f626db542dca614), SUCCESS).
+- **Withdraw** with a real ZK proof → verified on-chain by the `withdraw` verifier, nullifier `02e885ea…5f85884`, 1 XLM released to the recipient ([tx `d2d2aca3…`](https://stellar.expert/explorer/testnet/tx/d2d2aca363087a082483b905d5e7ae11ede07d934ed9ccfd46ffcfe9c44ad313), SUCCESS).
+
+---
+
 ## How It Works
 
 **User Flow** — `Connect → Bridge / Shield → Receive / Pay Privately → Trade / Swap → Withdraw`
@@ -221,28 +244,6 @@ The core implementation is organized into the following modules:
 
 ---
 
-## Smart Contracts
-
-### Addresses (Stellar Testnet)
-
-The full system is live and verified on Stellar Testnet.
-
-| Contract | Address | Description |
-|---|---|---|
-| **Lax-Stell Pool** | [`CBZNNVUKTG6YSVT3NGV7MDVL5ZQO5D4KLLIRFAGBCORPH7Q62ZHS5RP3`](https://stellar.expert/explorer/testnet/contract/CBZNNVUKTG6YSVT3NGV7MDVL5ZQO5D4KLLIRFAGBCORPH7Q62ZHS5RP3) | Core pool handling deposits, transfers, swaps, and withdrawals. |
-| **Verifier · withdraw** | [`CDS245ZQLXFIYD2TPSJWZLAO6TOZOGRF6FQWAJ35J5SG6A7WNMHUMD5B`](https://stellar.expert/explorer/testnet/contract/CDS245ZQLXFIYD2TPSJWZLAO6TOZOGRF6FQWAJ35J5SG6A7WNMHUMD5B) | On-chain UltraHonk verifier checking withdraw proofs. |
-| **Verifier · transfer** | [`CCTHUAA3I4R2BRUQEFREHQ3AWVLTCZECAZ7JRG5S23FM44LP27RY5NZB`](https://stellar.expert/explorer/testnet/contract/CCTHUAA3I4R2BRUQEFREHQ3AWVLTCZECAZ7JRG5S23FM44LP27RY5NZB) | On-chain UltraHonk verifier checking transfer proofs. |
-| **Verifier · place_order** | [`CABWY7YM7C4FCJBGQ7KG47N6NKZOBHWGMHAEYDTOGE6LDPOLZNGR2BF6`](https://stellar.expert/explorer/testnet/contract/CABWY7YM7C4FCJBGQ7KG47N6NKZOBHWGMHAEYDTOGE6LDPOLZNGR2BF6) | On-chain UltraHonk verifier checking order placement. |
-| **Verifier · match_orders** | [`CCKOCCPIYRRSCFNGDW3BDOGW4R2V7XY6KYHZVJDFB5KTKR5U3LPMAB5T`](https://stellar.expert/explorer/testnet/contract/CCKOCCPIYRRSCFNGDW3BDOGW4R2V7XY6KYHZVJDFB5KTKR5U3LPMAB5T) | On-chain UltraHonk verifier checking midpoint matches. |
-| **Verifier · cancel_order** | [`CCU4JPTB4KRSG2N6YOTPT7SDXMYIC7RJOMEHUCR44FADEBRBWXQTTB2M`](https://stellar.expert/explorer/testnet/contract/CCU4JPTB4KRSG2N6YOTPT7SDXMYIC7RJOMEHUCR44FADEBRBWXQTTB2M) | On-chain UltraHonk verifier checking order cancellations. |
-
-### Live ZK Proof Verification (E2E)
-
-Verified end-to-end on the current pool with a **real Noir/UltraHonk proof** (14,592-byte proof / 1,760-byte VK, keccak transcript) checked inside the Soroban contract:
-- **Deposit** 1 XLM → shielded note at leaf 0, commitment `0f090472…78e2…f92d0a` ([tx `cdaa631c…`](https://stellar.expert/explorer/testnet/tx/cdaa631c68bedd73a7cf469285e21c4d8ece913100baf9ae6f626db542dca614), SUCCESS).
-- **Withdraw** with a real ZK proof → verified on-chain by the `withdraw` verifier, nullifier `02e885ea…5f85884`, 1 XLM released to the recipient ([tx `d2d2aca3…`](https://stellar.expert/explorer/testnet/tx/d2d2aca363087a082483b905d5e7ae11ede07d934ed9ccfd46ffcfe9c44ad313), SUCCESS).
-
----
 
 ## Cross-Chain Bridge
 
