@@ -28,9 +28,12 @@ export interface ScrambleCycleProps {
   hold?: number
   /** RGB chromatic-aberration glitch on scrambling glyphs. */
   glitch?: boolean
+  /** Resolve the first word and stop, instead of cycling on `hold`. For static
+   *  labels that should settle in once rather than re-scramble on a loop. */
+  once?: boolean
 }
 
-export function ScrambleCycle({ words, className = '', duration = 900, hold = 2000, glitch = true }: ScrambleCycleProps) {
+export function ScrambleCycle({ words, className = '', duration = 900, hold = 2000, glitch = true, once = false }: ScrambleCycleProps) {
   const spacerRef = useRef<HTMLSpanElement>(null)
   const lettersRef = useRef<HTMLSpanElement>(null)
 
@@ -94,7 +97,7 @@ export function ScrambleCycle({ words, className = '', duration = 900, hold = 20
         raf = requestAnimationFrame(tick)
       } else {
         current = words[idx]
-        timer = window.setTimeout(advance, hold)
+        if (!once) timer = window.setTimeout(advance, hold)
       }
     }
 
@@ -116,7 +119,7 @@ export function ScrambleCycle({ words, className = '', duration = 900, hold = 20
       cancelAnimationFrame(raf)
       clearTimeout(timer)
     }
-  }, [words, duration, hold, glitch])
+  }, [words, duration, hold, glitch, once])
 
   return (
     <span className={`relative inline-block ${className}`} aria-label={words[0]}>

@@ -1,14 +1,26 @@
 import { useEffect, useRef } from 'react'
 import type { CSSProperties } from 'react'
-import FluidVolume from './FluidVolume'
 import ScrambleCycle from './ScrambleCycle'
 import { StoryShielded } from './StoryShielded'
+import heroBanner from '../assets/hero-banner.jpg'
 import logoDark from '../assets/logo-dark.png'
 import logoLight from '../assets/logo-light.png'
 import { ThemeToggle } from './ThemeToggle'
 import { useIsDark } from '../hooks/useTheme'
 
 const ROTATING = ['shielded', 'unlinkable', 'verified', 'private', 'yours']
+
+/** Coordinate-label copy. Module-level so ScrambleCycle's `words` stays
+ *  referentially stable across renders — an inline array would re-fire its
+ *  effect every render and restart the animation. The labels settle in once
+ *  (`once`) and then hold: they're fixed readouts, not a loop. Durations are
+ *  staggered so the three resolve in sequence rather than snapping together. */
+const NET_TITLE = ['Testnet']
+const NET_VALUE = ['Stellar · SDF Horizon']
+const PROOF_TITLE = ['Proof']
+const PROOF_VALUE = ['UltraHonk · BN254']
+const SHIELD_TITLE = ['Shielded']
+const SHIELD_VALUE = ['Poseidon2 · Merkle']
 
 const GRID_V = 'rgba(255,255,255,0.06)'
 const GRID_H = 'rgba(255,255,255,0.09)'
@@ -42,16 +54,28 @@ function ChartBackground({ dark }: { dark: boolean }) {
         style={{ opacity: 'var(--grid-op, 1)' }}
       >
         <li className="absolute left-[5%] top-[45%]">
-          <span className={`block ${textHighlight}`}>Testnet</span>
-          <span className="block">[ Stellar · SDF Horizon ]</span>
+          <span className={`block ${textHighlight}`}>
+            <ScrambleCycle words={NET_TITLE} duration={620} glitch={false} once />
+          </span>
+          <span className="block">
+            [ <ScrambleCycle words={NET_VALUE} duration={900} glitch={false} once /> ]
+          </span>
         </li>
         <li className="absolute right-[5%] top-[38%] text-right">
-          <span className={`block ${textHighlight}`}>Proof</span>
-          <span className="block">[ Groth16 · BN254 ]</span>
+          <span className={`block ${textHighlight}`}>
+            <ScrambleCycle words={PROOF_TITLE} duration={820} glitch={false} once />
+          </span>
+          <span className="block">
+            [ <ScrambleCycle words={PROOF_VALUE} duration={1150} glitch={false} once /> ]
+          </span>
         </li>
         <li className="absolute bottom-[16%] left-1/2 -translate-x-1/2 text-center">
-          <span className={`block ${textHighlight}`}>Shielded</span>
-          <span className="block">[ Poseidon · Merkle ]</span>
+          <span className={`block ${textHighlight}`}>
+            <ScrambleCycle words={SHIELD_TITLE} duration={1040} glitch={false} once />
+          </span>
+          <span className="block">
+            [ <ScrambleCycle words={SHIELD_VALUE} duration={1400} glitch={false} once /> ]
+          </span>
         </li>
       </ul>
     </div>
@@ -105,15 +129,37 @@ export function Landing({ onEnter }: { onEnter: () => void }) {
         className="relative min-h-screen w-full overflow-hidden"
         style={{ '--grid-v': dark ? GRID_V : GRID_V_LIGHT, '--grid-h': dark ? GRID_H : GRID_H_LIGHT, '--grid-op': 1 } as CSSProperties}
       >
-      {/* Backdrop — monopo.nyc volumetric raymarch (flowing caustic liquid).
-          Grain is a separate static overlay; the field's own alpha bleeds the
-          bottom edge into the footer cream. */}
-      <div className="absolute inset-0">
-        <FluidVolume
-          key={dark ? 'dark' : 'light'}
-          background={dark ? '#17120b' : '#efe9dc'}
-          baseColor={dark ? '#4f3e22' : '#b2a590'}
-          quality="high"
+      {/* Backdrop — hero banner, graded onto the brand's sepia axis so the gold
+          reads as the same world as the app surface rather than a standalone
+          illustration. `isolate` keeps the blend layers acting on the image
+          only, never on the page beneath. Grain is a separate static overlay. */}
+      <div className="absolute inset-0 isolate overflow-hidden">
+        <img
+          src={heroBanner}
+          alt=""
+          aria-hidden
+          className="h-full w-full object-cover"
+          style={{
+            filter: dark
+              ? 'saturate(0.45) contrast(1.05) brightness(0.44)'
+              : 'saturate(0.4) contrast(0.9) brightness(1.06)',
+          }}
+        />
+        {/* Hue tint — the same base colours the fluid field used, so the palette
+            carries over unchanged from the previous backdrop. */}
+        <div
+          className="absolute inset-0"
+          style={{ backgroundColor: dark ? '#4f3e22' : '#b2a590', mixBlendMode: 'color', opacity: 0.55 }}
+        />
+        {/* Ground wash — sinks the image toward the story ground (dark) or the
+            page cream (light) so the headline keeps its contrast. */}
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundColor: dark ? '#17120b' : '#efe9dc',
+            mixBlendMode: dark ? 'multiply' : 'screen',
+            opacity: dark ? 0.5 : 0.55,
+          }}
         />
       </div>
 
@@ -147,7 +193,7 @@ export function Landing({ onEnter }: { onEnter: () => void }) {
             {/* Dark logo (black mark) works with mix-blend-difference: inverts to white on dark bg */}
             <img src={logoDark} alt="Lax-Stell" className="h-12 w-auto" />
             <span className="font-display text-base font-semibold tracking-tight text-[#efe9dc]">
-              lax-stell <span className="align-super font-mono text-[10px] tracking-[0.2em] text-[#efe9dc]/60">ZK</span>
+              lax-stell
             </span>
           </a>
           <nav className="flex items-center gap-6 font-mono text-[11px] uppercase tracking-[0.18em]">
@@ -174,11 +220,12 @@ export function Landing({ onEnter }: { onEnter: () => void }) {
         >
           <span className="flex flex-wrap justify-center gap-x-[0.26em]">
             <Word>private</Word>
-            <Word>money</Word>
+            <Word>your</Word>
+            <Word>assets</Word>
           </span>
           <span className="flex flex-wrap justify-center gap-x-[0.26em]">
             <Word>that</Word>
-            <Word>stays</Word>
+            <Word>stay</Word>
           </span>
           <span className="block">
             <ScrambleCycle words={ROTATING} duration={900} hold={2000} />
